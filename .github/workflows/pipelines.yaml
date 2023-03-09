@@ -1,0 +1,20 @@
+name: Pre-Deployment Pipeline
+
+on:
+  workflow_dispatch: # Manually trigger the workflow through the Actions tab
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build Docker image
+      run: docker build -t onnx_image .
+
+    - name: Run ONNX converter
+      run: python convert_onnx.py
+
+    - name: Run tests on ONNX model
+      run: python test_onnx_model.py

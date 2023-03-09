@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Jetbrains dependencies
+.idea/
+
+# PyTorch Model
+*.pth
