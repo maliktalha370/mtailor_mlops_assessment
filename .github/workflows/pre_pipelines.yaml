@@ -14,7 +14,7 @@ jobs:
       run: docker build -t onnx_image .
 
     - name: Run ONNX converter
-      run: python convert_onnx.py
+      run: python convert_to_onnx.py
 
     - name: Run tests on ONNX model
-      run: python test_onnx_model.py
+      run: python test_onnx.py
