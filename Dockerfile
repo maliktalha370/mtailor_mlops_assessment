@@ -14,6 +14,10 @@ WORKDIR .
 
 # Install OpenCV from PyPI.
 RUN pip install -r requirements.txt
-CMD ["python", "convert_onnx.py"]
-CMD ["python", "test_onnx_model.py"]
 
+RUN python3 download.py
+
+# Add your custom app code, init() and inference()
+ADD app.py .
+
+CMD python3 -u server.py
