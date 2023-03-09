@@ -3,19 +3,16 @@
 
 import requests
 import base64
-import json
+from io import BytesIO
+from PIL import Image
 
+model_inputs = {'prompt': 'realistic field of grass'}
 
-with open('n01667114_mud_turtle.JPEG', "rb") as f:
-    im_bytes = f.read()
-im_b64 = base64.b64encode(im_bytes).decode("utf8")
+res = requests.post('http://localhost:8000/', json = model_inputs)
 
-headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+image_byte_string = res.json()["image_base64"]
 
-model_inputs = json.dumps({"prompt": im_b64})
-# model_inputs = {'prompt': open(', 'rb')}
-res = requests.post('http://localhost:8000/', json = model_inputs, headers=headers)
-
-return_output = res.json()["class_id"]
-
-print(return_output)
+image_encoded = image_byte_string.encode('utf-8')
+image_bytes = BytesIO(base64.b64decode(image_encoded))
+image = Image.open(image_bytes)
+image.save("output.jpg")
