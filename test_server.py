@@ -1,128 +1,69 @@
-# import argparse
-# import requests
-# import time
-# from PIL import Image
-#
-#
-# def predict_image(image_path, server_url):
-#     # Open image
-#     image = Image.open(image_path)
-#
-#     # Prepare data
-#     files = {"image": open(image_path, "rb")}
-#     data = {}
-#
-#     # Send POST request
-#     response = requests.post(server_url, data=data, files=files)
-#
-#     # Check response
-#     if response.status_code == 200:
-#         return response.json()['class_name']
-#     else:
-#         return None
-#
-#
-# def run_custom_tests(server_url):
-#     # Test image paths
-#     test_image_paths = ['test_images/cat.jpg', 'test_images/dog.jpg']
-#
-#     # Expected class names
-#     expected_class_names = ['Egyptian_cat', 'Pembroke']
-#
-#     # Run tests
-#     for i, image_path in enumerate(test_image_paths):
-#         expected_class_name = expected_class_names[i]
-#         start_time = time.time()
-#         class_name = predict_image(image_path, server_url)
-#         end_time = time.time()
-#         elapsed_time = end_time - start_time
-#         print(f"Test image {i + 1}: {image_path}")
-#         print(f"Expected class name: {expected_class_name}")
-#         print(f"Predicted class name: {class_name}")
-#         print(f"Elapsed time: {elapsed_time:.3f} seconds")
-#         print()
-#
-#
-# if __name__ == '__main__':
-#     # Parse arguments
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument('--image_path', type=str, help='Path to image file')
-#     parser.add_argument('--server_url', type=str, default='http://localhost:8000/predict',
-#                         help='URL of the deployed model server')
-#     parser.add_argument('--run_custom_tests', action='store_true', help='Run preset custom tests')
-#     args = parser.parse_args()
-#
-#     if args.run_custom_tests:
-#         run_custom_tests(args.server_url)
-#     elif args.image_path:
-#         # Predict single image
-#         class_name = predict_image(args.image_path, args.server_url)
-#         print(f"Class name: {class_name}")
-#     else:
-#         print("Please provide either an image path or the --run_custom_tests flag.")
+# This file is used to verify your http server acts as expected
+# Run it with `python3 test.py``
+import banana_dev as banana
 
-import requests
+import base64
 import time
-import argparse
 
-# Set up command line argument parser
-parser = argparse.ArgumentParser(description='Make a call to a model deployed on the banana dev.')
-parser.add_argument('image_path', type=str, help='Path to the image to be classified.')
-parser.add_argument('--custom_tests', action='store_true', help='Run custom tests on the model using predefined images.')
 
-# Define function to make a call to the model
-def make_call(image_path):
-    # Load image data
-    with open(image_path, 'rb') as f:
-        data = f.read()
-    # Open image
-    #     image = Image.open(image_path)
-    #
-    #     # Prepare data
-    #     files = {"image": open(image_path, "rb")}
-    #     data = {}
-    #
-    #     # Send POST request
-    #     response = requests.post(server_url, data=data, files=files)
-    #
-    #     # Check response
-    #     if response.status_code == 200:
-    #         return response.json()['class_name']
-    #     else:
-    #         return None
+def test_image(image_file):
 
-    # Set up URL and headers for the model
-    url = 'http://banana-dev/model/predict'
-    headers = {'Content-Type': 'application/octet-stream'}
+    with open(image_file, "rb") as f:
+        im_bytes = f.read()
+    im_b64 = base64.b64encode(im_bytes).decode("utf8")
 
-    # Make a call to the model and time it
+    model_inputs = {'prompt', im_b64}
+    API_KEY = 'abeb86b1-b32a-416d-aced-0f991c3ee386'
+    MODEL_KEY = '3c46f2bf-e46b-4b96-b587-ba78c5b5ec3a'
     start_time = time.time()
-    response = requests.post(url, headers=headers, data=data)
+    output = banana.run(API_KEY, MODEL_KEY, model_inputs)
     end_time = time.time()
+    print('Time taken:', end_time - start_time, 'seconds')
+    return output['class_id']
 
-    # Print the time taken for the call
-    print(f'Time taken for call: {end_time - start_time} seconds')
+def base_test():
+    test_images = ['n01440764_tench.jpeg', 'n01667114_mud_turtle.JPEG']
+    expected_class_ids = [0, 35]
+    pred_class_id = []
+    pred_class_name = []
+    expected_class_names = ['tench', 'mud turtle']
+    for i, image_path in enumerate(test_images):
+        with open(image_path, "rb") as f:
+            im_bytes = f.read()
+        # load the image
+        im_b64 = base64.b64encode(im_bytes).decode("utf8")
 
-    # Parse the response and print the class name
-    class_name = response.json()['class_name']
-    print(f'Class name: {class_name}')
+        model_inputs = {'prompt', im_b64}
+        API_KEY = 'abeb86b1-b32a-416d-aced-0f991c3ee386'
+        MODEL_KEY = '3c46f2bf-e46b-4b96-b587-ba78c5b5ec3a'
 
-# Define function to run custom tests on the model
-def run_custom_tests():
-    # Define image paths and expected class names for custom tests
-    test_images = {'tench': 'n01440764_tench.jpeg', 'mud turtle': 'n01667114_mud_turtle.JPEG'}
-    expected_results = {'tench': 'tench', 'mud turtle': 'mud turtle'}
+        output = banana.run(API_KEY, MODEL_KEY, model_inputs)
 
-    # Loop through the test images and make a call to the model for each one
-    for test_name, image_path in test_images.items():
-        print(f'Testing image: {test_name}')
-        make_call(image_path)
-        expected_result = expected_results[test_name]
-        print(f'Expected result: {expected_result}\n')
 
-# Parse the command line arguments and run the appropriate function
-args = parser.parse_args()
-if args.custom_tests:
-    run_custom_tests()
-else:
-    make_call(args.image_path)
+        pred_class_id.append(output)
+        if output == 0:
+            pred_class_name.append('tench')
+        elif output == 35:
+            pred_class_name.append('mud turtle')
+
+    if pred_class_id == expected_class_ids:
+        print("CLASS ID's same")
+    if pred_class_name == expected_class_names:
+        print("CLASS names's same")
+if __name__ == '__main__':
+    import argparse
+    # define command line arguments
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--preset', default='False', type=str,
+                        help='path to save the ONNX model')
+    args = parser.parse_args()
+
+    image_file = 'n01440764_tench.jpeg'
+
+    test_image(image_file)
+    if args.preset:
+        base_test()
+    else:
+        test_image(image_file)
+
