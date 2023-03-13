@@ -18,7 +18,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install requests
+        pip install requests, banana-dev
 
     - name: Run tests and report time taken
       run: |
