@@ -1,5 +1,7 @@
 # This file is used to verify your http server acts as expected
 # Run it with `python3 test.py``
+import json
+
 import banana_dev as banana
 
 import base64
@@ -12,9 +14,9 @@ def test_image(image_file):
         im_bytes = f.read()
     im_b64 = base64.b64encode(im_bytes).decode("utf8")
 
-    model_inputs = {'prompt', im_b64}
+    model_inputs = json.dumps({'prompt': im_b64})
     API_KEY = 'abeb86b1-b32a-416d-aced-0f991c3ee386'
-    MODEL_KEY = '3c46f2bf-e46b-4b96-b587-ba78c5b5ec3a'
+    MODEL_KEY = 'e41574b2-b5d1-42a1-a85b-1de16f8729c3'
     start_time = time.time()
     output = banana.run(API_KEY, MODEL_KEY, model_inputs)
     end_time = time.time()
@@ -33,9 +35,9 @@ def base_test():
         # load the image
         im_b64 = base64.b64encode(im_bytes).decode("utf8")
 
-        model_inputs = {'prompt', im_b64}
+        model_inputs = json.dumps({'prompt': im_b64})
         API_KEY = 'abeb86b1-b32a-416d-aced-0f991c3ee386'
-        MODEL_KEY = '3c46f2bf-e46b-4b96-b587-ba78c5b5ec3a'
+        MODEL_KEY = 'e41574b2-b5d1-42a1-a85b-1de16f8729c3'
 
         output = banana.run(API_KEY, MODEL_KEY, model_inputs)
 
