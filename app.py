@@ -17,6 +17,8 @@ def init():
 # Reference your preloaded global model variable here.
 def inference(model_inputs: dict) -> dict:
     global model
+
+    classes = {0:'tench',35: 'mud turtle'}
     pre = Preprocessor()
 
     im_b64 = json.loads(model_inputs).get('prompt', None)
@@ -25,7 +27,7 @@ def inference(model_inputs: dict) -> dict:
 
     img = pre.preprocess(io.BytesIO(img_bytes))
     result = model.predict(img)
-    class_id = np.argmax(result[0])
+
     # Return the results as a dictionary
 
-    return {'class_id': class_id}
+    return {'class_id': classes[result]}
