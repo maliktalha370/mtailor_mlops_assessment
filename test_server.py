@@ -7,6 +7,8 @@ import banana_dev as banana
 import base64
 import time
 
+API_KEY = 'abeb86b1-b32a-416d-aced-0f991c3ee386'
+MODEL_KEY = '85919015-d372-4af1-96bd-036f1afbf3fe'
 
 def test_image(image_file):
 
@@ -15,18 +17,11 @@ def test_image(image_file):
     im_b64 = base64.b64encode(im_bytes).decode("utf8")
 
     model_inputs = json.dumps({'prompt': im_b64})
-    API_KEY = 'abeb86b1-b32a-416d-aced-0f991c3ee386'
-    MODEL_KEY = '85919015-d372-4af1-96bd-036f1afbf3fe'
-    start_time = time.time()
-    output = banana.run(API_KEY, MODEL_KEY, model_inputs)
-    end_time = time.time()
-    print('Time taken:', end_time - start_time, 'seconds')
-    return output['class_id']
 
+    output = banana.run(API_KEY, MODEL_KEY, model_inputs)
+    return output['modelOutputs'][0]['class_id']
 def base_test():
     test_images = ['n01440764_tench.jpeg', 'n01667114_mud_turtle.JPEG']
-    expected_class_ids = [0, 35]
-    pred_class_id = []
     pred_class_name = []
     expected_class_names = ['tench', 'mud turtle']
     for i, image_path in enumerate(test_images):
@@ -36,36 +31,29 @@ def base_test():
         im_b64 = base64.b64encode(im_bytes).decode("utf8")
 
         model_inputs = json.dumps({'prompt': im_b64})
-        API_KEY = 'abeb86b1-b32a-416d-aced-0f991c3ee386'
-        MODEL_KEY = '85919015-d372-4af1-96bd-036f1afbf3fe'
 
         output = banana.run(API_KEY, MODEL_KEY, model_inputs)
-
-
-        pred_class_id.append(output)
-        if output == 0:
-            pred_class_name.append('tench')
-        elif output == 35:
-            pred_class_name.append('mud turtle')
-
-    if pred_class_id == expected_class_ids:
-        print("CLASS ID's same")
+        output  = output['modelOutputs'][0]['class_id']
+        pred_class_name.append(output)
     if pred_class_name == expected_class_names:
-        print("CLASS names's same")
+        print("TEST PASSED !!! Predicted classes matches with GroundTruth.")
 if __name__ == '__main__':
     import argparse
     # define command line arguments
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--preset', default='False', type=str,
+    parser.add_argument('--preset', action='store_true',
                         help='path to save the ONNX model')
     args = parser.parse_args()
 
     image_file = 'n01440764_tench.jpeg'
+    start_time = time.time()
 
-    test_image(image_file)
     if args.preset:
-        base_test()
+        result = base_test()
     else:
-        test_image(image_file)
+        result = test_image(image_file)
+        print(f'Model Detection for {image_file} is {result} ')
 
+    end_time = time.time()
+    print('Time taken:', end_time - start_time, 'seconds')
