@@ -1,5 +1,6 @@
 
 import io
+import json
 from model import OnnxModel, Preprocessor
 import base64
 import numpy as np
@@ -16,15 +17,17 @@ def init():
 # Reference your preloaded global model variable here.
 def inference(model_inputs: dict) -> dict:
     global model
+
+    classes = {0:'tench',35: 'mud turtle'}
     pre = Preprocessor()
 
-    im_b64 = model_inputs.get('prompt', None)
+    im_b64 = json.loads(model_inputs).get('prompt', None)
     # convert it into bytes
     img_bytes = base64.b64decode(im_b64.encode('utf-8'))
 
     img = pre.preprocess(io.BytesIO(img_bytes))
     result = model.predict(img)
-    class_id = np.argmax(result[0])
+
     # Return the results as a dictionary
 
-    return {'class_id': class_id}
+    return {'class_id': classes[result]}
