@@ -1,5 +1,6 @@
 
 import io
+import json
 from model import OnnxModel, Preprocessor
 import base64
 import numpy as np
@@ -18,7 +19,7 @@ def inference(model_inputs: dict) -> dict:
     global model
     pre = Preprocessor()
 
-    im_b64 = model_inputs.get('prompt', None)
+    im_b64 = json.loads(model_inputs).get('prompt', None)
     # convert it into bytes
     img_bytes = base64.b64decode(im_b64.encode('utf-8'))
 

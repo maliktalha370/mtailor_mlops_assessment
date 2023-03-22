@@ -16,7 +16,7 @@ def test_image(image_file):
 
     model_inputs = json.dumps({'prompt': im_b64})
     API_KEY = 'abeb86b1-b32a-416d-aced-0f991c3ee386'
-    MODEL_KEY = 'e41574b2-b5d1-42a1-a85b-1de16f8729c3'
+    MODEL_KEY = '85919015-d372-4af1-96bd-036f1afbf3fe'
     start_time = time.time()
     output = banana.run(API_KEY, MODEL_KEY, model_inputs)
     end_time = time.time()
@@ -37,7 +37,7 @@ def base_test():
 
         model_inputs = json.dumps({'prompt': im_b64})
         API_KEY = 'abeb86b1-b32a-416d-aced-0f991c3ee386'
-        MODEL_KEY = 'e41574b2-b5d1-42a1-a85b-1de16f8729c3'
+        MODEL_KEY = '85919015-d372-4af1-96bd-036f1afbf3fe'
 
         output = banana.run(API_KEY, MODEL_KEY, model_inputs)
 
